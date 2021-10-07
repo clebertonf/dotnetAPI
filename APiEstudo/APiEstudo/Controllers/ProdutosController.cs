@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using APiEstudo.Data;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,11 +12,17 @@ namespace APiEstudo.Controllers
     [Route("api")]
     public class ProdutosController : ControllerBase
     {
+        private readonly DataContext _context;
+        public ProdutosController(DataContext context)
+        {
+            _context = context;
+        }
+
         // GET: api/<ProdutosController>
         [HttpGet("produtos")]
         public ActionResult Get()
         {
-            return Ok("Ola mundo");
+            return Ok(_context.Produtos);
         }
     }
 }
