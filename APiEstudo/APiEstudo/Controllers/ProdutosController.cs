@@ -1,6 +1,7 @@
 ﻿using APiEstudo.Data;
 using APiEstudo.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,11 +29,11 @@ namespace APiEstudo.Controllers
 
         // GET/ID: api/produtos/id
         [HttpGet("produtos/{id}")]
-        public ActionResult GetId(int id)
+        public ActionResult GetId([FromRoute] int id)
         {
-            var message = new List<object>() { "Object not found " };
+
             var product = _context.Produtos.FirstOrDefault(product => product.Id == id);
-            if (product == null) return BadRequest(message);
+            if (product == null) return BadRequest("Product not found ");
             return Ok(product);
         }
 
@@ -48,16 +49,48 @@ namespace APiEstudo.Controllers
 
             } catch
             {
-                return BadRequest("Houve um erro");
+                return BadRequest("Houve um erro, Produto não cadastrado");
             };
            
         }
 
-        // PUT: api/produtos/put
-        [HttpPut("produtos/ed")]
-        public ActionResult Edit()
+        // PUT: api/produto/edit
+        [HttpPut("produtos/{id}")]
+        public ActionResult EditProduct(int id, [FromBody] Produtos produto)
         {
-            return Ok();
+          try
+            {
+                var product = _context.Produtos.AsNoTracking().FirstOrDefault(product => product.Id == id);
+                if (product == null) return BadRequest("Product not found ");
+
+                _context.Update(produto);
+                _context.SaveChanges();
+                return Ok(produto);
+            }
+            catch
+            {
+                return BadRequest("Houve um erro, produto não editado!");
+            }
+        }
+
+        // DELETE: api/produto/delete
+        [HttpDelete("produtos/{id}")]
+        public ActionResult DeleteProduct(int id)
+        {
+            try
+            {
+                var product = _context.Produtos.AsNoTracking().FirstOrDefault(product => product.Id == id);
+                if (product == null) return BadRequest("Product not found ");
+
+                _context.Remove(product);
+                _context.SaveChanges();
+                return Ok("Produto removido com Sucesso");
+            }
+            catch
+            {
+                return BadRequest("Houve um erro, produto não Deletado!");
+            }
+
         }
     }
 }
